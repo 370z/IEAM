@@ -36,7 +36,6 @@
     </v-navigation-drawer>
 
     <v-app-bar
-     
       elevation="1"
       dense
       app

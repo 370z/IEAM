@@ -14,10 +14,10 @@
           ></c-card-dashboard>
         </v-col>
       </v-row>
-      <v-row>
+      <!-- <v-row>
         <v-col> 1</v-col>
         <v-col>2</v-col>
-      </v-row>
+      </v-row> -->
       <v-row class="flex-column">
         <v-col>
           <v-card>
@@ -31,6 +31,7 @@
           </v-card>
         </v-col>
       </v-row>
+      <!-- {{process.env.BASE_URL}} -->
     </div>
   </div>
 </template>
@@ -107,6 +108,7 @@ export default {
       ],
     };
   },
+
 };
 </script>
 

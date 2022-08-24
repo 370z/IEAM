@@ -8,7 +8,7 @@
       <v-card class="content-card" elevation="6">
         <v-data-table
           :headers="headers"
-          :items="desserts"
+          :items="account_ie"
           :search="search"
           :loading="false"
           loading-text="Loading... Please wait"
@@ -21,8 +21,15 @@
               >
               <v-spacer />
               <v-col cols="2">
-                <v-btn color="#E39257" dark block depressed rounded to="accountIE/addlist">
-                  <v-icon  left @click="del(item)">mdi-plus </v-icon
+                <v-btn
+                  color="#E39257"
+                  dark
+                  block
+                  depressed
+                  rounded
+                  to="accountIE/addlist"
+                >
+                  <v-icon left >mdi-plus </v-icon
                   >เพิ่มรายการ</v-btn
                 >
               </v-col>
@@ -36,82 +43,32 @@
               {{ item.iron == 0 ? "รายจ่าย" : "รายรับ" }}
             </span>
           </template>
-          <template v-slot:[`item.actions`]="{  }">
+          <template v-slot:[`item.CreatedAt`]="{ item }">
             <div>
-              <v-icon @click="dialog = true">mdi-eye</v-icon>
+              {{ relativeTime(item.CreatedAt) }}
+            </div>
+          </template>
+          <template v-slot:[`item.actions`]="{ item }">
+            <div>
+              <v-icon @click="view(item)">mdi-eye </v-icon>
             </div>
           </template>
         </v-data-table>
       </v-card>
       <v-dialog v-model="dialog" max-width="70%">
-        <v-card>
-          <v-card-title>
-            <span>รายจ่าย</span>
-            <v-spacer></v-spacer>
-            <v-menu bottom left>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn icon v-bind="attrs" v-on="on" @click="dialog = false">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </template>
-            </v-menu>
-          </v-card-title>
-          <v-card-text>
-            <v-row class="d-flex">
-              <v-col>
-                <p>หัวเรื่อง : รายจ่ายประจำเดือน มิถุนายน ปีการศึกษา2565</p>
-                <p>เลขใบฟอร์ม : EP487539</p>
-              </v-col>
-              <v-col class="ml-10">
-                <p>วันที่ : 2022-04-22</p>
-                <p>จำนวนเงิน : 6,821.00 บาท</p>
-              </v-col>
-            </v-row>
-            <v-col>
-              <v-simple-table>
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left">รายการ</th>
-                      <th class="text-left">จำนวน</th>
-                      <th class="text-left">หน่วย</th>
-                      <th class="text-left">ราคา/หน่วย</th>
-                      <th class="text-left">รวม</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="item in form.list" :key="item.name">
-                      <td>{{ item.title }}</td>
-                      <td>{{ item.number }}</td>
-                      <td>{{ item.unit }}</td>
-                      <td>{{ item.unittonumber }}</td>
-                      <td>{{ item.total }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
-            </v-col>
-            <v-col>
-              <p>เอกสารแนบ :</p>
-              <v-img
-                lazy-src="https://picsum.photos/id/11/10/6"
-                max-height="150"
-                max-width="250"
-                src="https://picsum.photos/id/11/500/300"
-              ></v-img>
-            </v-col>
-          </v-card-text>
-        </v-card>
+        <layout-dialog-transfermomey :detail="account_iedetail" />
       </v-dialog>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import moment from "moment";
 export default {
   data() {
     return {
-      dialog: true,
+      dialog: false,
       search: null,
       items: [
         { value: null, text: "ทั้งหมด" },
@@ -128,12 +85,12 @@ export default {
         },
         {
           text: "เลขใบแบบฟอร์ม",
-          value: "calories",
+          value: "id_form",
           sortable: false,
           width: "10%",
         },
-        { text: "รายการ", value: "name", sortable: false, width: "%" },
-        { text: "จำนวนเงิน", value: "protein", sortable: false, width: "15%" },
+        { text: "รายการ", value: "title", sortable: false, width: "%" },
+        { text: "จำนวนเงิน", value: "total", sortable: false, width: "15%" },
         {
           text: "ประเภท",
           align: "center",
@@ -144,7 +101,7 @@ export default {
         {
           text: "วัน",
           align: "center",
-          value: "iron",
+          value: "CreatedAt",
           sortable: false,
           width: "10%",
         },
@@ -156,31 +113,32 @@ export default {
           width: "10%",
         },
       ],
-      desserts:[],
-      form: {
-        type: "ikp0jkp",
-        number: "sfd",
-        total: 100000,
-        date: "2022-01-02",
-        img: "wqwdsdfsdfsdfsdfsdf.com",
-        list: [
-          {
-            title: "sdsadasdasd",
-            number: 50,
-            unit: 20,
-            total: 20000,
-            unittonumber: 10,
-          },
-          {
-            title: "sdsadasdasd",
-            number: 50,
-            unit: 20,
-            total: 20000,
-            unittonumber: 10,
-          },
-        ],
-      },
+      account_ie: [],
+      account_iedetail: {},
     };
+  },
+  mounted() {
+    this.gettransfermdetail();
+  },
+  methods: {
+    async gettransfermdetail() {
+      await axios
+        .get(`${process.env.BASE_URL}/income-expenses/all`)
+        .then((response) => {
+          console.log(response.data.data);
+          this.account_ie = response.data?.data;
+        });
+    },
+    view(item) {
+      this.account_iedetail = item;
+      this.dialog = !this.dialog;
+    },
+
+    relativeTime(time) {
+      // moment.locale("th");
+      var result = moment().format('L');
+      return result;
+    },
   },
 };
 </script>
