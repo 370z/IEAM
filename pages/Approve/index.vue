@@ -1,10 +1,10 @@
 <template>
   <div class="content-size">
     <layout-title-page
-      title="การจัดการอนุมัติ เบิก/ยืม/คืน"
-      details="การอนุมัติในการ เบิก/ยืม/คืน"
+      title="จัดการอนุมัติ"
+      details="การอนุมัติเอกสาร รายรับ รายจ่าย เบิก ยืม คืน"
     ></layout-title-page>
-    <div class="content">
+    <v-col class="content">
       <v-card class="content-card" elevation="6">
         <v-data-table
           :headers="headers"
@@ -40,17 +40,36 @@
           </template>
           <template v-slot:[`item.isapprove`]="{ item }">
             <span
-              :style="`color: ${item.isapprove == 0 ? '#FFC83B' : '#30C03E'}`"
+              :style="`color: ${
+                item.isapprove == 0
+                  ? '#FFC83B'
+                  : item.isapprove == 1
+                  ? '#48A451'
+                  : '#CD2126'
+              }`"
             >
-              {{ item.isapprove == 0 ? "รอการอนุมัติ" : "อนุมัติเรียบร้อย" }}
+              {{
+                item.isapprove == 0
+                  ? "รอการอนุมัติ"
+                  : item.isapprove == 1
+                  ? "อนุมัติเรียบร้อย"
+                  : "ไม่อนุมัติ"
+              }}
             </span>
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <div v-if="item.isapprove == 0">
-              <v-btn color="success" rounded x-small fab elevation="false">
-                <v-icon @click="dialog_approve = true">
-                  mdi-check
-                </v-icon></v-btn
+              <v-btn
+                color="success"
+                rounded
+                x-small
+                fab
+                elevation="false"
+                @click="
+                  (dialog_approve = true), (confirm.id_form = item.id_form)
+                "
+              >
+                <v-icon> mdi-check </v-icon></v-btn
               >
               <v-btn
                 class="ml-2"
@@ -59,12 +78,26 @@
                 x-small
                 fab
                 elevation="false"
+                @click="
+                  change_status('cancel', (confirm.id_form = item.id_form))
+                "
               >
-                <v-icon @click="view(item)">mdi-close </v-icon></v-btn
+                <v-icon>mdi-close </v-icon></v-btn
               >
             </div>
-            <div v-if="item.isapprove == 1">
-              <v-icon @click="view(item)"> mdi-eye </v-icon>
+            <div v-if="item.isapprove != 0">
+              <v-btn
+                class="ml-2"
+                color="blue"
+                style="color: #ffffff"
+                small
+                rounded
+                elevation="false"
+                @click="view(item)"
+              >
+                <v-icon>mdi-eye</v-icon> ดูรายละเอียด</v-btn
+              >
+              <!-- <v-icon @click="view(item)"> mdi-eye </v-icon> -->
             </div>
           </template>
         </v-data-table>
@@ -89,27 +122,35 @@
           </v-card-title>
           <v-card-text class="d-flex">
             <v-text-field
+              v-model="confirm.password"
               outlined
               dense
               hide-details
               placeholder="กรอกรห้สผ่าน"
             ></v-text-field>
-            <v-btn class="ml-5" color="primary">ยืนยัน</v-btn>
+            <v-btn
+              class="ml-5"
+              color="primary"
+              :disabled="!confirm"
+              @click="change_status('confirm')"
+              >ยืนยัน</v-btn
+            >
           </v-card-text>
         </v-card>
       </v-dialog>
       <v-dialog v-model="dialog" max-width="70%">
         <layout-dialog-transfermomey
           :detail="account_wbr_approve_detail"
-          @dialogview-click="dialog = !dialog"
+          @closedialog="dialog = !dialog"
+          :show="dialog"
         />
       </v-dialog>
-    </div>
+    </v-col>
   </div>
 </template>
 
 <script>
-
+import axios from "axios";
 export default {
   data() {
     return {
@@ -121,6 +162,7 @@ export default {
         { value: "0", text: "รอการอนุมัติ" },
         { value: "1", text: "อนุมัติเรียบร้อย" },
       ],
+      confirm: {},
       account_wbr_approve: [],
       account_wbr_approve_detail: {},
       headers: [
@@ -138,14 +180,14 @@ export default {
           width: "10%",
         },
         { text: "ชื่อ-นามสกุล", value: "name", sortable: false, width: "15%" },
+        { text: "จำนวนเงิน", value: "total", sortable: false, width: "15%" },
         {
           text: "ประเภท",
           align: "center",
-          value: "type",
+          value: "type.nametype",
           sortable: false,
           width: "15%",
         },
-        { text: "จำนวนเงิน", value: "total", sortable: false, width: "15%" },
         {
           text: "สถานะการอนุมัติ",
           align: "center",
@@ -165,13 +207,16 @@ export default {
   },
   mounted() {
     this.gettransfermdetail();
+    this.lv = [1];
+    if (!this.lv.includes(this.$auth.state.user.level)) {
+      this.$router.push("/dashboard");
+    }
   },
   methods: {
     async gettransfermdetail() {
-      await axios
-        .get(`${process.env.BASE_URL}/transfermoney/all`)
+      await this.$axios
+        .get(`${process.env.BASE_URL}/form/all`)
         .then((response) => {
-          console.log(response.data.data);
           this.account_wbr_approve = response.data?.data;
         });
     },
@@ -179,6 +224,39 @@ export default {
       this.account_wbr_approve_detail = item;
       this.dialog = !this.dialog;
       console.log(this.account_wbr_approve_detail);
+    },
+    async change_status(type) {
+      if (type == "confirm") {
+        await this.$axios
+          .patch(`${process.env.BASE_URL}/approve/approve`, {
+            ...this.confirm,
+            isapprove: 1,
+          })
+          .then((response) => {
+            this.dialog_approve = !this.dialog_approve;
+            alert("ทำการอนุมัติเรียบร้อย");
+            window.location.reload(true);
+          })
+          .catch((err) => {
+            alert(err);
+          });
+      } else {
+        if (confirm("ทำการไม่อนุมัติใช่ไหม")) {
+          await this.$axios
+            .patch(`${process.env.BASE_URL}/approve/approve`, {
+              ...this.confirm,
+              isapprove: 2,
+            })
+            .then((response) => {
+              this.confirm;
+              alert("ทำการไม่อนุมัติเรียบร้อย");
+              window.location.reload(true);
+            })
+            .catch((err) => {
+              alert(err);
+            });
+        }
+      }
     },
   },
 };

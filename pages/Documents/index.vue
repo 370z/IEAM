@@ -4,17 +4,16 @@
       title="ยื่นเอกสาร เบิก/ยืม/คืน"
       details="การขออนุญาติในการ เบิก/ยืม/คืน"
     ></layout-title-page>
-    <!-- <div class="content">
+    <!-- <v-col class="content">
       <v-row> </v-row>
     </div> -->
-    <div class="name_class">
-      <button>sdfgdd</button>
-    </div>
+      <c-form />
   </div>
 </template>
 
 <script>
 export default {
+  middleware: 'auth',
   data() {
     return {
       items: [

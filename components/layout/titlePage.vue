@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <v-col class="warpper_titlepage">
     <h1 class="font-40">{{ title }}</h1>
     <h1 class="font-16">{{ details }}</h1>
-  </div>
+  </v-col>
 
 </template>
 
@@ -22,4 +22,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 </style>

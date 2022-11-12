@@ -1,10 +1,10 @@
 <template>
   <div class="content-size">
     <layout-title-page
-      title="การจัดการบัญชี รายรับ/รายจ่าย"
+      title="จัดการ รายรับ/รายจ่าย"
       details="การจัดการบัญชีรายรับ-รายจ่าย"
     />
-    <div class="content">
+    <v-col class="content">
       <v-card class="content-card" elevation="6">
         <v-data-table
           :headers="headers"
@@ -29,8 +29,7 @@
                   rounded
                   to="accountIE/addlist"
                 >
-                  <v-icon left >mdi-plus </v-icon
-                  >เพิ่มรายการ</v-btn
+                  <v-icon left>mdi-plus </v-icon>เพิ่มรายการ</v-btn
                 >
               </v-col>
             </v-row>
@@ -39,8 +38,10 @@
             {{ index + 1 }}
           </template>
           <template v-slot:[`item.type`]="{ item }">
-            <span :style="`color: ${item.iron == 0 ? '#EB3C41' : '#34ACFF'}`">
-              {{ item.iron == 0 ? "รายจ่าย" : "รายรับ" }}
+            <span
+              :style="`color: ${item.type.typeId == 2 ? '#EB3C41' : '#34ACFF'}`"
+            >
+              {{ item.type.typeId == 2 ? "รายจ่าย" : "รายรับ" }}
             </span>
           </template>
           <template v-slot:[`item.CreatedAt`]="{ item }">
@@ -48,17 +49,68 @@
               {{ relativeTime(item.CreatedAt) }}
             </div>
           </template>
+          <template v-slot:[`item.isapprove`]="{ item }">
+            <span
+              :style="`color: ${
+                item.isapprove == 0
+                  ? '#FFC83B'
+                  : item.isapprove == 1
+                  ? '#48A451'
+                  : '#CD2126'
+              }`"
+            >
+              {{
+                item.isapprove == 0
+                  ? "รอการอนุมัติ"
+                  : item.isapprove == 1
+                  ? "อนุมัติเรียบร้อย"
+                  : "ไม่อนุมัติ"
+              }}
+            </span>
+          </template>
           <template v-slot:[`item.actions`]="{ item }">
             <div>
-              <v-icon @click="view(item)">mdi-eye </v-icon>
+              <div v-if="item.isapprove == 1">
+                <v-btn
+                  class="ml-2"
+                  color="blue"
+                  style="color: #ffffff"
+                  small
+                  rounded
+                  elevation="false"
+                  @click="view(item)"
+                >
+                  <v-icon>mdi-eye</v-icon> ดูรายละเอียด</v-btn
+                >
+              </div>
+              <v-icon
+                v-if="item.isapprove != 1"
+                @click="view(item)"
+                color="#2096f3"
+                >mdi-eye
+              </v-icon>
+              <v-icon
+                v-if="item.isapprove != 1"
+                @click="edit(item.id_form)"
+                color="#FFC83B"
+                >mdi-pencil</v-icon
+              >
+              <v-icon
+                v-if="item.isapprove != 1"
+                @click="del(item.id_form)"
+                color="#CD2126"
+                >mdi-delete
+              </v-icon>
             </div>
           </template>
         </v-data-table>
       </v-card>
-      <v-dialog v-model="dialog" max-width="70%">
-        <layout-dialog-transfermomey :detail="account_iedetail" />
-      </v-dialog>
-    </div>
+      <layout-dialog-transfermomey
+        :detail="account_iedetail"
+        :show="dialog"
+        @closedialog="dialog = !dialog"
+      />
+    </v-col>
   </div>
 </template>
 
@@ -99,6 +151,13 @@ export default {
           width: "10%",
         },
         {
+          text: "สถานะการอนุมัติ",
+          align: "center",
+          value: "isapprove",
+          sortable: false,
+          width: "10%",
+        },
+        {
           text: "วัน",
           align: "center",
           value: "CreatedAt",
@@ -119,13 +178,16 @@ export default {
   },
   mounted() {
     this.gettransfermdetail();
+    this.lv = [2];
+    if (!this.lv.includes(this.$auth.state.user.level)) {
+      this.$router.push("/dashboard");
+    }
   },
   methods: {
     async gettransfermdetail() {
-      await axios
-        .get(`${process.env.BASE_URL}/income-expenses/all`)
+      await this.$axios
+        .get(`${process.env.BASE_URL}/ie/all`)
         .then((response) => {
-          console.log(response.data.data);
           this.account_ie = response.data?.data;
         });
     },
@@ -133,11 +195,28 @@ export default {
       this.account_iedetail = item;
       this.dialog = !this.dialog;
     },
-
+    edit(item) {
+      this.$router.push(`AccountIE/${item}`);
+    },
+    async del(item) {
+      if (confirm("ต้องการลบข้อมูลนี้ใช่ไหม")) {
+        axios
+          .delete(`${process.env.BASE_URL}/form/delete`, {
+            params: { id: item },
+          })
+          .then((response) => {
+            alert("ลบข้อมูลสำเร็จ");
+          });
+      }
+    },
     relativeTime(time) {
       // moment.locale("th");
-      var result = moment().format('L');
+      var result = moment().format("L");
       return result;
+    },
+    dialogviewclick() {
+      console.log(item);
+      this.dialog = item;
     },
   },
 };

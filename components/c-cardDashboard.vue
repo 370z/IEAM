@@ -1,25 +1,36 @@
 <template>
-  <v-card elevation="2">
-    <div>{{ type }}</div>
-    <div style="text-align: center">{{ number }}</div>
-    <div style="text-align: right">{{ currency }}</div>
+  <v-card elevation="5">
+    <v-icon :style="`color:${color}`" size="50px">{{ icon }}</v-icon>
+    <div class="data mt-2">
+      <span class="type">{{ type }}</span>
+      <span class="number">{{ number.toLocaleString("en-US") }}</span>
+      <span class="currency">{{ currency }}</span>
+    </div>
   </v-card>
 </template>
 
 <script>
 export default {
   props: {
-    'type': {
+    type: {
       type: String,
       default: "ประเภท",
     },
-    'number': {
+    number: {
       type: Number,
       default: "000000",
     },
-    'currency': {
+    currency: {
       type: String,
       default: "สกุลเงิน",
+    },
+    color: {
+      type: String,
+      default: "",
+    },
+    icon: {
+      type: String,
+      default: "",
     },
   },
   // data() {},
@@ -28,10 +39,33 @@ export default {
 
 <style lang="scss" scoped>
 .v-card {
+  height: 180px;
+  padding: 10px 30px;
+  border-radius: 15px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 150px;
-  padding: 15px 45px;
+  justify-content: center;
+
+  .v-icon {
+    justify-content: start;
+  }
+
+  .data {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .type {
+      font-size: 20px;
+      // font-weight: bold;
+    }
+
+    .number {
+      font-size: 25px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin: -5px 0;
+    }
+  }
 }
 </style>

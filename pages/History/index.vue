@@ -1,10 +1,10 @@
 <template>
   <div class="content-size">
     <layout-title-page
-      title="การจัดการบัญชี รายรับ/รายจ่าย"
+      title="ประวัติการทำรายการ"
       details="การจัดการบัญชีรายรับ-รายจ่าย"
     ></layout-title-page>
-    <div class="content">
+    <v-col class="content">
       <v-card class="content-card" elevation="6">
         <v-data-table
           :headers="headers"
@@ -74,7 +74,7 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-    </div>
+    </v-col>
   </div>
 </template>
 
@@ -89,7 +89,7 @@ export default {
         { value: "0", text: "รอการอนุมัติ" },
         { value: "1", text: "อนุมัติเรียบร้อย" },
       ],
-      desserts:[],
+      desserts: [],
       headers: [
         {
           text: "ลำดับ",
@@ -134,6 +134,12 @@ export default {
         },
       ],
     };
+  },
+  mounted() {
+    this.lv = [1, 2];
+    if (!this.lv.includes(this.$auth.state.user.level)) {
+      this.$router.push("/dashboard");
+    }
   },
 };
 </script>

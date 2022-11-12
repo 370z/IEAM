@@ -4,12 +4,19 @@
       title="เพิ่มรายการ"
       details="เพิ่มรายการบัญชีรายรับ-รายจ่าย"
     />
-    <page-form-account-ie type="add"/>
+    <c-form type="add"/>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  mounted() {
+    this.lv =  [2];
+    if(!this.lv.includes(this.$auth.state.user.level)){
+      this.$router.push("/dashboard");
+    }
+  },
+};
 </script>
 
 <style>

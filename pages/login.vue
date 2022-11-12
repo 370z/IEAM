@@ -13,7 +13,7 @@
           <v-row justify="center" align="center">
             <v-col justify="center" align-self="center" cols="12">
               <v-text-field
-                v-model="username"
+                v-model="formlogin.username"
                 placeholder="ชื่อผู้ใช้"
                 prepend-inner-icon="mdi-account"
                 hide-details
@@ -22,7 +22,7 @@
             </v-col>
             <v-col cols="12">
               <v-text-field
-                v-model="password"
+                v-model="formlogin.password"
                 placeholder="รห้สผ่าน"
                 prepend-inner-icon="mdi-key"
                 :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
@@ -44,7 +44,9 @@
         </form>
       </div>
     </div>
-    <v-alert v-if="alert.snackbar" border="left" dense :type="alert.type">{{alert.msg}}</v-alert>
+    <v-alert v-if="alert.snackbar" border="left" dense :type="alert.type">{{
+      alert.msg
+    }}</v-alert>
     <!-- <c-alert :alert="alert" /> -->
     <c-loader :isloader="loader" />
   </div>
@@ -61,35 +63,33 @@ export default {
       },
       loader: false,
       show: false,
-      username: "",
-      password: "",
+      formlogin: {
+        username: "",
+        password: "",
+      },
     };
   },
+  mounted() {
+    if (this.$auth.loggedIn) {
+      this.$router.push("/dashboard");
+    }
+  },
   methods: {
-      async login() {
-      console.log("dfgdfg");
+    async login() {
       this.loader = true;
-       if (this.username == "admin" && this.password == "admin") {
-        await this.$store.dispatch("User/set", val= "ok");
-        this.loader = false;
-        console.log("ok");
-        this.alert = {
-          snackbar: true,
-          msg: "เข้าสู่ระบบสำเร็จ",
-          type: "success",
-        };
-        // setTimeout(() => {
-        //   this.$router.push("/Dashboard");
-        // }, 800);
-        return;
-      }
-      console.log("error");
-      this.alert = {
-        snackbar: true,
-        msg: "ชื่อผู้ใช้ หรือรห้สผ่านไม่ถูกต้อง",
-        type: "error",
-      };
-      this.loader = false;
+      await this.$auth
+        .loginWith("local", { data: this.formlogin })
+        .then((response) => {
+          this.loader = false;
+          alert(response.data.msg);
+
+          this.$router.push({ path: "/dashboard" });
+        })
+        .catch((err) => {
+          console.log(err);
+          alert(err.response.data?.msg);
+          this.loader = false;
+        });
     },
   },
 };
@@ -99,7 +99,7 @@ export default {
 .background {
   width: 100%;
   height: 100%;
-  background-image: url("https://images.unsplash.com/photo-1595113316349-9fa4eb24f884?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1772&q=100");
+  // background-image: url("https://images.unsplash.com/photo-1595113316349-9fa4eb24f884?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1772&q=100");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -108,12 +108,6 @@ export default {
 }
 
 .login__container {
-  // background-color: rgba(255, 255, 255, 0.883);
-  // background: linear-gradient(
-  //   130.94deg,
-  //   #ffffff 2.82%,
-  //   #ffffffc9 67.61%
-  // );
   min-width: 300px;
   max-width: 400px;
   position: absolute;
@@ -123,19 +117,9 @@ export default {
   text-align: center;
   padding: 15px;
   border-radius: 25px;
-  // box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
-
-  // .wrapper__login {
-  //   border: 3px solid $color_red;
-  //   padding: 25px 10px;
-  //   border-radius: 25px;
-  // }
 
   p {
     margin: 0;
   }
 }
-// .login__container > .v-input__slot {
-//   box-shadow: inset 0px 4px 4px rgb(0 0 0 / 25%);
-// }
 </style>
