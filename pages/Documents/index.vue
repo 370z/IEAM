@@ -14,6 +14,12 @@
 <script>
 export default {
   middleware: 'auth',
+    mounted() {
+    this.lv = [1];
+    if (!this.lv.includes(this.$auth.state.user.level)) {
+      this.$router.push("/dashboard");
+    }
+  },
   data() {
     return {
       items: [

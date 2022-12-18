@@ -9,13 +9,29 @@
         <v-data-table
           :headers="headers"
           :items="userall"
+          :search="search"
           :loading="false"
           loading-text="Loading... Please wait"
           no-data-text="ไม่พบข้อมูล"
         >
           <template v-slot:top>
+            <v-row
+              ><v-col cols="3"
+                ><h1 class="font-20">ผู้ใช้งาน ( {{userall.length}} )</h1></v-col
+              ></v-row
+            >
             <v-row>
-              <v-col cols="3"><h1 class="font-20">ผู้ใช้งาน (100)</h1></v-col>
+              <v-col cols="3">
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  placeholder="Search"
+                  dense
+                  outlined
+                  rounded
+                  hide-details
+                ></v-text-field>
+              </v-col>
               <v-spacer />
               <v-col cols="2">
                 <v-btn
@@ -143,7 +159,6 @@
                   placeholder="เลือกสถานะ"
                   dense
                   outlined
-                  :rules="rules.req"
                 ></v-select>
               </v-col>
             </v-row>
@@ -165,13 +180,14 @@ export default {
       dialog: false,
       mode: "c",
       userall: [],
+      search: null,
       userdetail: {
         username: null,
         password: null,
         firstname: null,
         lastname: null,
         phonenumber: null,
-        level: 0,
+        level: 1,
       },
       level: [
         { id: 1, name: "ผู้ใช้งาน" },
@@ -214,15 +230,16 @@ export default {
     dialog(val) {
       if (!val) {
         this.userdetail = {};
+        this.$refs.formlist.reset()
       }
     },
   },
   mounted() {
-    this.getUserall();
-    this.lv =  [2];
-    if(!this.lv.includes(this.$auth.state.user.level)){
+    this.lv = [3];
+    if (!this.lv.includes(this.$auth.state.user.level)) {
       this.$router.push("/dashboard");
     }
+    this.getUserall();
   },
   methods: {
     async getUserall() {
@@ -244,18 +261,30 @@ export default {
     },
     async submit() {
       if (this.$refs.formlist.validate()) {
+        console.log(this.mode);
         if (this.mode == "c") {
           await this.$axios
             .post(`${process.env.BASE_URL}/user/create`, this.userdetail)
             .then((response) => {
-              console.log(response.data?.data);
+              alert("เพิ่มข้อมูลสำเร็จ");
             });
+        }
+        if (this.mode == "e") {
+          await this.$axios
+            .patch(`${process.env.BASE_URL}/user/edite`, this.userdetail)
+            .then((response) => {
+              alert("แก้ไขข้อมูลสำเร็จ");
+            });
+        }
+        this.dialog = !this.dialog;
+        if (this.mode != "v") {
+          this.getUserall();
         }
       }
     },
     async del(item) {
       if (confirm("ต้องการลบข้อมูลนี้ใช่ไหม")) {
-        axios
+        this.$axios
           .delete(`${process.env.BASE_URL}/user/delete`, {
             params: { id: this.userall[item].accountId },
           })

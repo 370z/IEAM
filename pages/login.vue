@@ -32,9 +32,9 @@
                 solo
               ></v-text-field>
             </v-col>
-            <v-col cols="12" align="right" class="mr-4">
+            <!-- <v-col cols="12" align="right" class="mr-4">
               <nuxt-link to="/">ลืมรห้สผ่าน</nuxt-link>
-            </v-col>
+            </v-col> -->
             <v-col cols="12">
               <c-login-button class="login__button" type="submit"
                 >เข้าสู่ระบบ</c-login-button

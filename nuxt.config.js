@@ -1,6 +1,12 @@
 import colors from 'vuetify/es5/util/colors'
+require("dotenv").config();
+const env = require("./env");
 
 export default {
+  env: {
+    ...env,
+    API_ENV: process.env.API_ENV
+  },
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
 
@@ -27,13 +33,16 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
+    'element-ui/lib/theme-chalk/index.css',
     '~/assets/styles/app.scss',
     '~/assets/styles/reset.scss',
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '~/plugins/axios'
+    '~/plugins/axios',
+    { src: "~/plugins/element-ui.js", ssr: false },
+    { src: "~/plugins/pdfmake", ssr: false },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -113,5 +122,10 @@ export default {
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-  }
+    extend(config) {
+      config.node = {
+        fs: 'empty'
+      }
+    }
+  },
 }

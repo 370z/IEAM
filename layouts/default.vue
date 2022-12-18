@@ -16,7 +16,6 @@
       <v-list>
         <v-list-item-group class="groupManu">
           <v-row v-for="item in items" :key="item.title">
-            <!-- v-if="item.lv.includes($auth.state.user.level)" -->
             <v-list-item
               v-if="item.lv.includes($auth.state.user.level)"
               :to="item.to"
@@ -75,45 +74,51 @@ export default {
       items: [
         {
           icon: "mdi-layers",
-          title: "Dashboard",
+          title: "ดูภาพรวมของตัวระบบ",
           to: "/dashboard",
-          lv: [0, 1, 2],
+          lv: [1, 2, 3],
+        },
+        {
+          icon: "mdi-list-status",
+          title: "การจัดการรายการที่ค้าง",
+          to: "/arrears",
+          lv: [1],
         },
         {
           icon: "mdi-cash-sync",
           title: "การจัดการบัญชี โอนเงิน",
           to: "/transfermoney",
-          lv: [2],
+          lv: [3],
         },
         {
           icon: "mdi-cash-multiple",
           title: "การจัดการบัญชี รายรับ/รายจ่าย",
           to: "/accountIE",
-          lv: [2],
+          lv: [3],
         },
         {
           icon: "mdi-account-multiple-plus-outline",
           title: "การจัดการผู้ใช้งาน",
           to: "/createUser",
-          lv: [2],
+          lv: [3],
         },
         {
           icon: "mdi-clipboard-check",
           title: "การจัดการอนุมัติ เบิก/ยืม/คืน",
           to: "/approve",
-          lv: [1],
+          lv: [2],
         },
-        // {
-        //   icon: "mdi-clipboard",
-        //   title: "การจัดการบัญชี เบิก/ยืม/คืน ",
-        //   to: "/history",
-        //   lv: [1,2],
-        // },
         {
           icon: "mdi-clipboard-plus",
           title: "เพิ่มแบบฟอร์ม เบิก/ยืม/คืน",
           to: "/documents",
-          lv: [0, 1, 2],
+          lv: [1],
+        },
+        {
+          icon: "mdi-file-chart",
+          title: "การจัดการรายงาน ร่ายรับ/ร่ายจ่าย/เบิก/ยืม/คืน",
+          to: "/report",
+          lv: [3],
         },
       ],
       title: "ระบบบริหารจัดการบัญชีรายรับรายจ่าย ด้วยแพลตฟอร์มออนไลน์ ",

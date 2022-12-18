@@ -2,9 +2,11 @@
   <v-card elevation="5">
     <v-icon :style="`color:${color}`" size="50px">{{ icon }}</v-icon>
     <div class="data mt-2">
-      <span class="type">{{ type }}</span>
-      <span class="number">{{ number.toLocaleString("en-US") }}</span>
-      <span class="currency">{{ currency }}</span>
+      <span class="type">{{ dashbord_data.nametype }}</span>
+      <span class="number">{{
+        dashbord_data.sum ? dashbord_data.sum.toLocaleString("en-US") : "0"
+      }}</span>
+      <span class="currency">บาท</span>
     </div>
   </v-card>
 </template>
@@ -12,13 +14,9 @@
 <script>
 export default {
   props: {
-    type: {
-      type: String,
-      default: "ประเภท",
-    },
-    number: {
-      type: Number,
-      default: "000000",
+    dashbord_data: {
+      type: Object,
+      default: () => ({}),
     },
     currency: {
       type: String,
@@ -45,6 +43,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 250px;
 
   .v-icon {
     justify-content: start;

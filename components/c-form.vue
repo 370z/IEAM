@@ -16,6 +16,7 @@
           <v-col>
             <label for="">ประเภท</label>
             <v-select
+              :disabled="mode == 'r'"
               :items="type"
               item-value="id"
               item-text="name"
@@ -30,6 +31,7 @@
             <label for="">ยอดรวม</label>
             <v-text-field
               v-model="list.total"
+              :disabled="mode == 'r'"
               type="number"
               placeholder="กรอกยอดรวม"
               dense
@@ -38,7 +40,7 @@
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="mode != 'r'">
           <v-col>
             <label for="">รายการ</label>
           </v-col>
@@ -72,7 +74,7 @@
             </v-data-table>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="mode != 'r'">
           <v-col style="cursor: pointer">
             <v-btn color="primary" depressed small @click="dialog = true"
               >เพิ่มรายการ</v-btn
@@ -85,22 +87,34 @@
             <label for="">หลักฐาน</label>
           </v-col>
           <v-col cols="4">
-            <v-file-input
-              accept=".jpeg,.jpg,.png,image/jpeg,image/png"
-              show-size
-              counter
-              label="รูปหลักฐาน"
-              @change="upload"
-              type="file"
-              prepend-icon="mdi-file-image"
-              :rules="rules.req"
-            />
-            <!-- <input
-      type="file"
-      accept=".jpeg,.jpg,.png,image/jpeg,image/png"
-      aria-label="upload image button"
-      @change="upload"
-    /> -->
+            <el-upload
+              action="#"
+              :limit="1"
+              :disabled="this.mode == 'v' ? true : false"
+              :file-list="selectedFile"
+              :on-change="addfile"
+              list-type="picture-card"
+              :auto-upload="false"
+              accept="image/*"
+              v-if="selectedFile"
+            >
+              <i slot="default" class="el-icon-plus"></i>
+              <div slot="file" slot-scope="{ file }" style="height: 100%">
+                <img
+                  class="el-upload-list__item-thumbnail"
+                  :src="file.url || list.img_url"
+                  alt=""
+                />
+                <span v-if="mode != 'v'" class="el-upload-list__item-actions">
+                  <span
+                    class="el-upload-list__item-delete"
+                    @click="handleRemove(file)"
+                  >
+                    <i class="el-icon-delete"></i>
+                  </span>
+                </span>
+              </div>
+            </el-upload>
           </v-col>
         </v-row>
         <v-row class="space-center">
@@ -209,11 +223,12 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <c-loader :isloader="loading" />
   </v-col>
 </template>
 
 <script>
-import axios from "axios";
+import { storage } from "~/plugins/firebase";
 export default {
   props: {
     mode: {
@@ -223,17 +238,15 @@ export default {
   },
   data() {
     return {
+      loading:false,
       type: [
-        { id: 1, name: "รายรับ" },
-        { id: 2, name: "รายจ่าย" },
         { id: 3, name: "การเบิก" },
         { id: 4, name: "การยืม" },
-        { id: 5, name: "การคืน" },
       ],
       isValid: null,
       dialog: false,
       isSelecting: false,
-      selectedFile: null,
+      selectedFile: [],
       list: {
         number_form: null,
         title: null,
@@ -241,17 +254,13 @@ export default {
         total: null,
         list: [],
         img_url: "",
-        user: {
-          accountId: 3,
-          username: "dsfds",
-        },
       },
       detaillistbackup: {},
       detaillist: {
-        tirftal: "",
-        number: 0,
+        title: "",
+        number: "",
         unit: "",
-        unit_price: 0,
+        unit_price: "",
         total: 0,
       },
       headers: [
@@ -293,24 +302,43 @@ export default {
     dialog() {
       if (!this.dialog) {
         this.detaillist = {
-          tirftal: "",
-          number: 1,
+          title: "",
+          number: "",
           unit: "",
           unit_price: 0,
           total: 0,
         };
+        this.$refs.formlist.reset();
       }
     },
   },
   mounted() {
-    if (this.mode == "e") {
+    if (this.$auth.state.user.level == 3) {
+      this.type = [
+        { id: 1, name: "รายรับ" },
+        { id: 2, name: "รายจ่าย" },
+      ];
+    }
+    if (this.mode != "c") {
       this.$axios
         .get(`${process.env.BASE_URL}/form/detail`, {
           params: this.$route.params,
         })
         .then((response) => {
-          this.list = response.data?.data[0];
+          if (this.mode == "r") {
+            this.list.total = response.data?.data[0].total;
+            this.list.title = response.data?.data[0].title;
+          } else {
+            this.list = response.data?.data[0];
+            this.selectedFile.push({ url: this.list.img_url });
+          }
         });
+    }
+    if (this.mode == "r") {
+      this.id_form = this.$route.params;
+      this.type = [{ id: 5, name: "การคืน" }];
+      this.list.typeId = 5;
+      // this.list.totall =
     }
   },
   methods: {
@@ -320,10 +348,16 @@ export default {
         this.dialog = !this.dialog;
       }
     },
-    upload(e) {
-      this.selectedFile = e;
+    addfile(files, fileList) {
+      this.selectedFile.push(fileList[0]);
     },
-
+    handleRemove(file) {
+      for (let index = 0; index < this.selectedFile.length; index++) {
+        if (this.selectedFile[index].uid === file.uid) {
+          this.selectedFile.splice(index, 1);
+        }
+      }
+    },
     total() {
       this.detaillist.total =
         parseInt(this.detaillist.unit_price) * parseInt(this.detaillist.number);
@@ -332,43 +366,82 @@ export default {
     del(item) {
       this.list.list.splice(this.list.list.indexOf(item), 1);
     },
+    uploadFirebase(file) {
+      // for (let index = 0; index <= file.length; index++) {
+      if (file.status == "ready") {
+        return new Promise((resolve, reject) => {
+          let metadata = {
+            contentType: file.raw.type,
+          };
+
+          let task = storage
+            .ref()
+            .child(`Documents/documents-${file.raw.uid}`)
+            .put(file.raw, metadata);
+
+          task
+            .then((snapshot) => {
+              snapshot.ref.getDownloadURL().then((url) => {
+                this.list.img_url = url;
+                resolve(url);
+              });
+            })
+            .catch((error) => {
+              reject(error);
+              this.$message.error("อัพโหลดรูปไม่สำเร็จ");
+            });
+        });
+        // }
+      }
+    },
     async onsubmit() {
       if (this.$refs.form.validate()) {
+        this.loading = true;
+        if (this.selectedFile[0]) {
+          await this.uploadFirebase(this.selectedFile[0]);
+        }
         if (this.mode != "e") {
-          await this.$axios
-            .post(`${process.env.BASE_URL}/form/add`, {
-              ...this.list,
-              total: + this.list.total,
-            })
-            .then((response) => {
-              alert("เพิ่มข้อมูลสำเร็จ(รอการอนุมัติ)");
-              this.$router.go(-1)
-            });
+          this.mode == "r"
+            ? await this.$axios
+                .post(`${process.env.BASE_URL}/form/addreturn`, {
+                  id_form: parseInt(this.$route.params.id),
+                  returnborrow: {
+                    ...this.list,
+                    total: parseInt(this.list.total),
+                    userId: this.$auth.state.user.accountId,
+                  },
+                })
+                .then((response) => {
+                  alert("เพิ่มข้อมูลสำเร็จ(รอการอนุมัติ)");
+                  this.$router.replace("/arrears");
+                })
+            : await this.$axios
+                .post(`${process.env.BASE_URL}/form/add`, {
+                  ...this.list,
+                  total: parseInt(this.list.total),
+                  userId: this.$auth.state.user.accountId,
+                })
+                .then((response) => {
+                  alert("เพิ่มข้อมูลสำเร็จ(รอการอนุมัติ)");
+                  this.$router.replace("/accountIE" || "/dashboard");
+                });
         } else {
+          this.uploadFirebase(this.selectedFile[0]);
           await this.$axios
             .put(`${process.env.BASE_URL}/form/update`, {
               ...this.list,
               total: +this.list.total,
+              userId: this.$auth.state.user.accountId,
             })
             .then((response) => {
               alert("แก้ไขข้อมูลสำเร็จ(รอการอนุมัติ)");
-              this.$router.go(-1)
+              this.$router.replace("/accountIE");
+              this.$router.go(-1);
             });
         }
       }
+      this.loading = false
     },
-    // edit(item) {
-    //   this.mode = "e";
-    //   var id = this.list.detaillist.indexOf(item);
-    //   this.detaillist = JSON.parse(
-    //     JSON.stringify(this.list.detaillist[id])
-    //   );
-    //   this.detaillistbackup = JSON.parse(
-    //     JSON.stringify(this.list.detaillist[id])
-    //   );
-    //   // this.detaillist = this.list.detaillist[id];
-    //   this.dialog = !this.dialog;
-    // },
   },
 };
 </script>

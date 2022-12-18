@@ -14,7 +14,6 @@ export default {};
 .login__button button {
   width: 100%;
   height: 40px;
-
   background: linear-gradient(
     90.94deg,
     #192786 2.82%,

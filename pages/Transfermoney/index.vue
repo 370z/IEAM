@@ -17,26 +17,30 @@
           <template v-slot:top>
             <v-row>
               <v-col cols="3"
-                ><h1 class="font-20">รายการทั้งหมด (100)</h1></v-col
+                ><h1 class="font-20">รายการทั้งหมด ( {{datatable.length}} )</h1></v-col
               >
               <v-spacer />
-              <v-col cols="2">
-                <v-select
+              <v-col cols="3">
+                <v-text-field
                   v-model="search"
-                  :menu-props="{ offsetY: true }"
-                  :items="items"
-                  item-value="value"
-                  item-text="text"
+                  append-icon="mdi-magnify"
+                  placeholder="Search"
                   dense
                   outlined
                   rounded
                   hide-details
-                ></v-select>
+                ></v-text-field>
               </v-col>
             </v-row>
           </template>
           <template v-slot:[`item.id`]="{ index }">
             {{ index + 1 }}
+          </template>
+          <template v-slot:[`item.user`]="{ item }">
+            {{ item.user.firstname + " " + item.user.lastname }}
+          </template>
+          <template v-slot:[`item.total`]="{ item }">
+            {{ item.total.toLocaleString("en-US")}}
           </template>
           <template v-slot:[`item.istransfermoney`]="{ item }">
             <span
@@ -50,31 +54,31 @@
             </span>
           </template>
           <template v-slot:[`item.actions`]="{ item }">
-            <v-btn
-              color="primary"
+            <el-upload
               v-if="item.istransfermoney == 0"
-              outlined
-              rounded
-              small
-              :loading="isSelecting"
-              @click="handleFileImport"
+              action="#"
+              accept="image/*"
+              list-type="picture"
+              :on-change="addfile"
+              :auto-upload="false"
+              :show-file-list="false"
             >
-              <v-icon left @click="del(item)"> mdi-file-image </v-icon>แนบรูปภาพ
-              <input
-                ref="uploader"
-                class="d-none"
-                type="file"
-                accept="image/*"
-                @change="onFileChanged"
-              />
-            </v-btn>
+              <el-button
+                size="small"
+                type="primary"
+                round
+                plain
+                @click="view(item), (viewdetail = false)"
+                >แนบรูปภาพ
+              </el-button>
+            </el-upload>
             <v-btn
               color="primary"
               v-if="item.istransfermoney == 1"
               outlined
               rounded
               small
-              @click="view(item)"
+              @click="view(item), (dialog1 = !dialog1), (viewdetail = true)"
             >
               <v-icon left>mdi-image-search </v-icon>ดูหลักฐาน</v-btn
             >
@@ -84,22 +88,63 @@
       <v-dialog v-model="dialog" max-width="70%">
         <layout-dialog-transfermomey
           :detail="transfermdetail"
-          @dialogview-click="dialog = !dialog"
+          @closedialog="dialog = !dialog"
+          :show="dialog"
         />
+      </v-dialog>
+      <v-dialog v-model="dialog1" max-width="30%">
+        <v-card class="dialogtransfer">
+          <img
+            class="el-upload-list__item-thumbnail"
+            :src="selectedFile.url || transfermdetail.img_urltransfer"
+            :lazy-src="selectedFile.url"
+            alt=""
+          />
+          <v-row class="space-center">
+            <v-col cols="4" v-if="!viewdetail">
+              <v-btn
+                width="100%"
+                class="mx-2"
+                color="primary"
+                rounded
+                depressed
+                @click="change_status()"
+                >บันทึกรายการ</v-btn
+              >
+            </v-col>
+            <v-col cols="4">
+              <v-btn
+                width="100%"
+                class="mx-2"
+                color="error"
+                rounded
+                depressed
+                outlined
+                @click="dialog1 = !dialog1"
+                >ยกเลิก</v-btn
+              >
+            </v-col>
+          </v-row>
+        </v-card>
       </v-dialog>
     </v-col>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import { storage } from "~/plugins/firebase";
 export default {
   data() {
     return {
       isSelecting: false,
-      selectedFile: null,
+      selectedFile: {
+        url: null,
+      },
+      viewdetail: false,
       search: null,
       dialog: false,
+      dialog1: false,
+      loading: false,
       items: [
         { value: null, text: "ทั้งหมด" },
         { value: "0", text: "รอการดำเนินการ" },
@@ -119,15 +164,22 @@ export default {
           text: "เลขใบแบบฟอร์ม",
           value: "number_form",
           sortable: false,
+          align: "center",
           width: "10%",
         },
-        { text: "ชื่อ-นามสกุล", value: "name", sortable: false, width: "15%" },
+        {
+          text: "ชื่อ-นามสกุล",
+          value: "name",
+          sortable: false,
+          width: "15%",
+          value: "user",
+        },
         {
           text: "ประเภท",
           align: "center",
-          value: "type.nametype",
           sortable: false,
           width: "15%",
+          value: "type.nametype",
         },
         { text: "จำนวนเงิน", value: "total", sortable: false, width: "15%" },
         {
@@ -149,26 +201,61 @@ export default {
   },
   mounted() {
     this.gettransfermdetail();
-    this.lv = [2];
+    this.lv = [3];
     if (!this.lv.includes(this.$auth.state.user.level)) {
       this.$router.push("/dashboard");
     }
   },
   methods: {
-    handleFileImport() {
-      this.isSelecting = true;
-      window.addEventListener(
-        "focus",
-        () => {
-          this.isSelecting = false;
-        },
-        { once: true }
-      );
-      this.$refs.uploader.click();
+    addfile(files) {
+      this.selectedFile = files;
+      this.dialog1 = true;
     },
-    onFileChanged(e) {
-      this.selectedFile = e.target.files[0];
+
+    uploadFirebase(file) {
+      if (file.status == "ready") {
+        return new Promise((resolve, reject) => {
+          let metadata = {
+            contentType: file.raw.type,
+          };
+
+          let task = storage
+            .ref()
+            .child(`Transfermoney/transfermoney-${file.raw.uid}`)
+            .put(file.raw, metadata);
+
+          task
+            .then((snapshot) => {
+              snapshot.ref.getDownloadURL().then((url) => {
+                resolve(url);
+              });
+            })
+            .catch((error) => {
+              reject(error);
+              this.$message.error("อัพโหลดรูปไม่สำเร็จ");
+            });
+        });
+      }
     },
+
+    async change_status() {
+      const url = await this.uploadFirebase(this.selectedFile);
+      const data = {
+        id_form: this.transfermdetail.id_form,
+        istransfermomey: true,
+        img_urltransfer: url,
+      };
+      await this.$axios
+        .patch(`${process.env.BASE_URL}/approve/transfermomey`, data)
+        .then((response) => {
+          alert("เพิ่มหลักฐานการชำระเงินเรียบร้อย");
+          window.location.reload(true);
+        })
+        .catch((err) => {
+          alert(err);
+        });
+    },
+
     async gettransfermdetail() {
       await this.$axios
         .get(`${process.env.BASE_URL}/wer/approve`)
@@ -178,12 +265,19 @@ export default {
     },
     view(item) {
       this.transfermdetail = item;
-      this.dialog = !this.dialog;
-      console.log(this.dialog);
     },
   },
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.dialogtransfer {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+
+  img {
+    margin: 25px;
+  }
+}
 </style>

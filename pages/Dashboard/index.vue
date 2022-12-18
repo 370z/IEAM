@@ -6,65 +6,69 @@
     ></layout-title-page>
     <div class="content">
       <v-row>
-        <v-col cols="2.5" v-for="item in items" :key="item.title">
+        <v-col v-if="this.$auth.state.user.level != 1">
           <c-card-dashboard
-            :type="item.title"
-            :number="item.total"
-            :currency="item.currency"
-            :color="item.color"
-            :icon="item.icon"
+            :dashbord_data="dashbord_data[0]"
+            :currency="items[0].currency"
+            :color="items[0].color"
+            :icon="items[0].icon"
+          ></c-card-dashboard>
+        </v-col>
+        <v-col v-if="this.$auth.state.user.level != 1">
+          <c-card-dashboard
+            :dashbord_data="dashbord_data[1]"
+            :currency="items[1].currency"
+            :color="items[1].color"
+            :icon="items[1].icon"
+          ></c-card-dashboard>
+        </v-col>
+        <v-col>
+          <c-card-dashboard
+            :dashbord_data="dashbord_data[2]"
+            :currency="items[2].currency"
+            :color="items[2].color"
+            :icon="items[2].icon"
+          ></c-card-dashboard>
+        </v-col>
+        <v-col>
+          <c-card-dashboard
+            :dashbord_data="dashbord_data[3]"
+            :currency="items[3].currency"
+            :color="items[3].color"
+            :icon="items[3].icon"
+          ></c-card-dashboard>
+        </v-col>
+        <v-col>
+          <c-card-dashboard
+            :dashbord_data="dashbord_data[4]"
+            :currency="items[4].currency"
+            :color="items[4].color"
+            :icon="items[4].icon"
           ></c-card-dashboard>
         </v-col>
       </v-row>
-      <!-- <v-row>
-        <v-col cols="4">
-          <c-card-status></c-card-status>
+      <v-row v-if="this.$auth.state.user.level == 3">
+        <v-col cols="3">
+          <c-card-status :data="dashbord_numberform"></c-card-status>
         </v-col>
-        <v-col cols="8">
-          <v-card class="content-card" elevation="6">
-            <h1>dsfsd</h1>
-            <h1>dsfsd</h1>
-            <h1>dsfsd</h1>
-          </v-card></v-col
-        >
-      </v-row> -->
+        <v-col cols="9">
+          <c-cardnotreture :datatable="dashbord_notreturn"></c-cardnotreture>
+        </v-col>
+      </v-row>
       <v-row class="flex-column">
         <v-col>
           <v-card class="content-card" elevation="6">
-            <h2 class="mb-5">ประวัติทำรายการย้อนหลัง</h2>
-            <v-data-table
-              :headers="headers"
-              :items="desserts"
-              :loading="false"
-              loading-text="Loading... Please wait"
-              no-data-text="ไม่พบข้อมูล"
-            >
-              <template v-slot:[`item.id`]="{ index }">
-                {{ index + 1 }}
-              </template>
-              <template v-slot:[`item.updatedapprove`]="{ item }">
-                {{ relativeTime(item.updatedapprove) }}
-              </template>
-               <template v-slot:[`item.isapprove`]="{ item }">
-            <span
-              :style="`color: ${
-                item.isapprove == 0
-                  ? '#FFC83B'
-                  : item.isapprove == 1
-                  ? '#48A451'
-                  : '#CD2126'
-              }`"
-            >
-              {{
-                item.isapprove == 0
-                  ? "รอการอนุมัติ"
-                  : item.isapprove == 1
-                  ? "อนุมัติเรียบร้อย"
-                  : "ไม่อนุมัติ"
-              }}
-            </span>
-          </template>
-            </v-data-table>
+            <v-row>
+              <h2 class="mb-5">ประวัติทำรายการ</h2>
+            </v-row>
+              <table-history-user
+                :datatable="desserts"
+                v-if="this.$auth.state.user.level == 1"
+              />
+              <table-history-admin
+                v-if="this.$auth.state.user.level != 1"
+                :datatable="desserts"
+              />
           </v-card>
         </v-col>
       </v-row>
@@ -74,99 +78,92 @@
 
 <script>
 import moment from "moment";
-import cCardStatus from "../../components/c-cardStatus.vue";
 export default {
-  components: { cCardStatus },
   data() {
     return {
+      dashbord_notreturn: [],
+      dashbord_data: {},
+      dashbord_numberform:{},
       items: [
         {
-          title: "รายรับ",
-          total: 1000000,
-          currency: "บาท",
           color: "#4caf4f",
           icon: "mdi-bank-transfer-in",
         },
         {
-          title: "รายจ่าย",
-          total: 30000,
-          currency: "บาท",
           color: "#ff3b2f",
           icon: "mdi-bank-transfer-out",
         },
         {
-          title: "การเบิก",
-          total: 1000,
-          currency: "บาท",
           color: "#f9ae00",
           icon: "mdi-clipboard-list",
         },
         {
-          title: "การยืม",
-          total: 40000,
-          currency: "บาท",
           color: "#ffe000",
           icon: "mdi-text-box-minus-outline",
         },
         {
-          title: "การคืน",
-          total: 43040,
-          currency: "บาท",
           color: "#009fe3",
           icon: "mdi-text-box-plus-outline",
         },
       ],
       desserts: [],
-      headers: [
-        {
-          text: "ลำดับ",
-          align: "center",
-          value: "id",
-          sortable: false,
-          width: "5%",
-        },
-        {
-          text: "วัน",
-          align: "center",
-          value: "updatedapprove",
-          sortable: false,
-          width: "20%",
-        },
-        {
-          text: "เลขใบแบบฟอร์ม",
-          value: "id_form",
-          sortable: false,
-          width: "20%",
-        },
-        { text: "รายการ", value: "title", sortable: false, width: "%" },
-        {
-          text: "ประเภท",
-          align: "center",
-          value: "type.nametype",
-          sortable: false,
-          width: "10%",
-        },
-        {
-          text: "สถานะ",
-          align: "center",
-          value: "isapprove",
-          sortable: false,
-          width: "15%",
-        },
-      ],
     };
   },
   mounted() {
     this.gethistory();
+    this.getdashbord_historynotreturn();
+    this.getdashbord_data();
   },
   methods: {
+    async getdashbord_historynotreturn() {
+      if (this.$auth.state.user.level != 1) {
+        await this.$axios
+          .get(`${process.env.BASE_URL}/dashbord/dashbord_historynotreturn`)
+          .then((response) => {
+            this.dashbord_notreturn = response.data?.data;
+          });
+      }
+    },
+    async getdashbord_data() {
+      if (this.$auth.state.user.level == 1) {
+        await this.$axios
+          .get(`${process.env.BASE_URL}/dashbord/dashbord`, {
+            params: { id: this.$auth.state.user.accountId },
+          })
+          .then((response) => {
+            this.dashbord_data = response.data?.data;
+          });
+      } else {
+        await this.$axios
+          .get(`${process.env.BASE_URL}/dashbord/dashbord_all`)
+          .then((response) => {
+            this.dashbord_data = response.data?.data;
+            this.dashbord_numberform = response.data?.data_numberform;
+          });
+      }
+    },
     async gethistory() {
-      await this.$axios
-        .get(`${process.env.BASE_URL}/history/approve`)
-        .then((response) => {
-          this.desserts = response.data?.data;
-          console.log(this.desserts);
-        });
+      if (this.$auth.state.user.level == 2) {
+        await this.$axios
+          .get(`${process.env.BASE_URL}/history/approve`)
+          .then((response) => {
+            this.desserts = response.data?.data;
+          });
+      } else if (this.$auth.state.user.level == 3) {
+        await this.$axios
+          .get(`${process.env.BASE_URL}/history/finance`)
+          .then((response) => {
+            this.desserts = response.data?.data;
+          });
+      } else {
+        await this.$axios
+          .get(`${process.env.BASE_URL}/history/user`, {
+            params: { id: this.$auth.state.user.accountId },
+          })
+          .then((response) => {
+            this.desserts = response.data?.data;
+          });
+      }
     },
     relativeTime(time) {
       // moment.locale("th");

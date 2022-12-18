@@ -8,7 +8,7 @@
       <v-card class="content-card" elevation="6">
         <v-data-table
           :headers="headers"
-          :items="account_ie"
+          :items="form"
           :search="search"
           :loading="false"
           loading-text="Loading... Please wait"
@@ -17,8 +17,23 @@
           <template v-slot:top>
             <v-row>
               <v-col cols="3"
-                ><h1 class="font-20">รายการทั้งหมด (100)</h1></v-col
-              >
+                ><h1 class="font-20">
+                  รายการทั้งหมด ( {{ form.length }} )
+                </h1></v-col
+              ></v-row
+            >
+            <v-row>
+              <v-col cols="3">
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  placeholder="Search"
+                  dense
+                  outlined
+                  rounded
+                  hide-details
+                ></v-text-field>
+              </v-col>
               <v-spacer />
               <v-col cols="2">
                 <v-btn
@@ -36,6 +51,9 @@
           </template>
           <template v-slot:[`item.id`]="{ index }">
             {{ index + 1 }}
+          </template>
+          <template v-slot:[`item.total`]="{ item }">
+            {{ item.total.toLocaleString("en-US") }}
           </template>
           <template v-slot:[`item.type`]="{ item }">
             <span
@@ -68,9 +86,9 @@
               }}
             </span>
           </template>
-          <template v-slot:[`item.actions`]="{ item }">
+          <template v-slot:[`item.actions`]="{ item, index }">
             <div>
-              <div v-if="item.isapprove == 1">
+              <div v-if="item.isapprove != 0">
                 <v-btn
                   class="ml-2"
                   color="blue"
@@ -84,20 +102,20 @@
                 >
               </div>
               <v-icon
-                v-if="item.isapprove != 1"
+                v-if="item.isapprove == 0"
                 @click="view(item)"
                 color="#2096f3"
                 >mdi-eye
               </v-icon>
               <v-icon
-                v-if="item.isapprove != 1"
+                v-if="item.isapprove == 0"
                 @click="edit(item.id_form)"
                 color="#FFC83B"
                 >mdi-pencil</v-icon
               >
               <v-icon
-                v-if="item.isapprove != 1"
-                @click="del(item.id_form)"
+                v-if="item.isapprove == 0"
+                @click="del(item.id_form, index)"
                 color="#CD2126"
                 >mdi-delete
               </v-icon>
@@ -105,17 +123,18 @@
           </template>
         </v-data-table>
       </v-card>
+    </v-col>
+    <v-dialog v-model="dialog" max-width="70%">
       <layout-dialog-transfermomey
-        :detail="account_iedetail"
+        :detail="formdetail"
         :show="dialog"
         @closedialog="dialog = !dialog"
       />
-    </v-col>
+    </v-dialog>
   </div>
 </template>
 
 <script>
-import axios from "axios";
 import moment from "moment";
 export default {
   data() {
@@ -137,9 +156,10 @@ export default {
         },
         {
           text: "เลขใบแบบฟอร์ม",
-          value: "id_form",
+          value: "number_form",
           sortable: false,
           width: "10%",
+          align: "center",
         },
         { text: "รายการ", value: "title", sortable: false, width: "%" },
         { text: "จำนวนเงิน", value: "total", sortable: false, width: "15%" },
@@ -172,13 +192,13 @@ export default {
           width: "10%",
         },
       ],
-      account_ie: [],
-      account_iedetail: {},
+      form: [],
+      formdetail: {},
     };
   },
   mounted() {
     this.gettransfermdetail();
-    this.lv = [2];
+    this.lv = [3];
     if (!this.lv.includes(this.$auth.state.user.level)) {
       this.$router.push("/dashboard");
     }
@@ -188,24 +208,26 @@ export default {
       await this.$axios
         .get(`${process.env.BASE_URL}/ie/all`)
         .then((response) => {
-          this.account_ie = response.data?.data;
+          this.form = response.data?.data;
         });
     },
     view(item) {
-      this.account_iedetail = item;
+      this.formdetail = item;
       this.dialog = !this.dialog;
     },
     edit(item) {
       this.$router.push(`AccountIE/${item}`);
     },
-    async del(item) {
+    async del(item, index) {
+      console.log(item, index);
       if (confirm("ต้องการลบข้อมูลนี้ใช่ไหม")) {
-        axios
+        this.$axios
           .delete(`${process.env.BASE_URL}/form/delete`, {
             params: { id: item },
           })
           .then((response) => {
             alert("ลบข้อมูลสำเร็จ");
+            this.form.splice(index, 1);
           });
       }
     },

@@ -17,26 +17,44 @@
           <template v-slot:top>
             <v-row>
               <v-col cols="3"
-                ><h1 class="font-20">รายการทั้งหมด (100)</h1></v-col
+                ><h1 class="font-20">
+                  รายการทั้งหมด ( {{ account_wbr_approve.length }} )
+                </h1></v-col
               >
               <v-spacer />
-              <v-col cols="2">
-                <v-select
+              <v-col cols="3">
+                <v-text-field
                   v-model="search"
-                  :menu-props="{ offsetY: true }"
-                  :items="items"
-                  item-value="value"
-                  item-text="text"
+                  append-icon="mdi-magnify"
+                  placeholder="Search"
                   dense
                   outlined
                   rounded
                   hide-details
-                ></v-select>
+                ></v-text-field>
               </v-col>
             </v-row>
           </template>
           <template v-slot:[`item.id`]="{ index }">
             {{ index + 1 }}
+          </template>
+          <template v-slot:[`item.number_form`]="{ item }">
+            <span
+              style="
+                cursor: pointer;
+                color: #2096f3;
+                text-decoration: underline;
+              "
+              @click="view(item)"
+            >
+              {{ item.number_form }}
+            </span>
+          </template>
+          <template v-slot:[`item.name`]="{ item }">
+            {{ item.user.firstname + " " + item.user.lastname }}
+          </template>
+          <template v-slot:[`item.total`]="{ item }">
+            {{ item.total.toLocaleString("en-US") }}
           </template>
           <template v-slot:[`item.isapprove`]="{ item }">
             <span
@@ -59,31 +77,45 @@
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <div v-if="item.isapprove == 0">
-              <v-btn
-                color="success"
-                rounded
-                x-small
-                fab
-                elevation="false"
-                @click="
-                  (dialog_approve = true), (confirm.id_form = item.id_form)
-                "
-              >
-                <v-icon> mdi-check </v-icon></v-btn
-              >
-              <v-btn
-                class="ml-2"
-                color="error"
-                rounded
-                x-small
-                fab
-                elevation="false"
-                @click="
-                  change_status('cancel', (confirm.id_form = item.id_form))
-                "
-              >
-                <v-icon>mdi-close </v-icon></v-btn
-              >
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    color="success"
+                    rounded
+                    x-small
+                    fab
+                    v-bind="attrs"
+                    v-on="on"
+                    elevation="false"
+                    @click="
+                      (dialog_approve = true), (confirm.id_form = item.id_form)
+                    "
+                  >
+                    <v-icon> mdi-check </v-icon></v-btn
+                  >
+                </template>
+                <span>อนุมัติ</span>
+              </v-tooltip>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    class="ml-2"
+                    color="error"
+                    rounded
+                    x-small
+                    fab
+                    v-bind="attrs"
+                    v-on="on"
+                    elevation="false"
+                    @click="
+                      change_status('cancel', (confirm.id_form = item.id_form))
+                    "
+                  >
+                    <v-icon>mdi-close </v-icon></v-btn
+                  >
+                </template>
+                <span>ไม่อนุมัติ</span>
+              </v-tooltip>
             </div>
             <div v-if="item.isapprove != 0">
               <v-btn
@@ -122,6 +154,7 @@
           </v-card-title>
           <v-card-text class="d-flex">
             <v-text-field
+              type="password"
               v-model="confirm.password"
               outlined
               dense
@@ -175,7 +208,7 @@ export default {
         },
         {
           text: "เลขใบแบบฟอร์ม",
-          value: "id_form",
+          value: "number_form",
           sortable: false,
           width: "10%",
         },
@@ -207,7 +240,7 @@ export default {
   },
   mounted() {
     this.gettransfermdetail();
-    this.lv = [1];
+    this.lv = [2];
     if (!this.lv.includes(this.$auth.state.user.level)) {
       this.$router.push("/dashboard");
     }
@@ -223,7 +256,6 @@ export default {
     view(item) {
       this.account_wbr_approve_detail = item;
       this.dialog = !this.dialog;
-      console.log(this.account_wbr_approve_detail);
     },
     async change_status(type) {
       if (type == "confirm") {
