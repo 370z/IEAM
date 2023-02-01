@@ -14,7 +14,7 @@ let FIREBASE = {
 let env = {
 	development: {
 		VERSION: '1.0.0(beta)',
-		BASE_URL:'http://localhost:8080',
+		BASE_URL:'http://project.ichigozdata.win:8080',
 		FIREBASE,
 	},
 	production: {

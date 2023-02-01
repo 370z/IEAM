@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    container_name: ball_db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+    networks:
+      - ball-network
+  api:
+    build: ./IEAM-Backend
+    container_name: ball_api
+    restart: always
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./IEAM-Backend:/opt/app/api
+    depends_on:
+      - db
+    networks:
+      - ball-network
+  web:
+    # build: ./IEAM-Frontend
+    build:
+      context: ./IEAM-Frontend
+      dockerfile: Dockerfile
+      args:
+        BASE_URL: http://project.ichigozdata.win:3000
+        API_URL: http://project.ichigozdata.win:8080
+    container_name: ball_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    networks:
+      - ball-network
+volumes:
+  db:
+    driver: local
+
+networks:
+  ball-network:
+    driver: bridge

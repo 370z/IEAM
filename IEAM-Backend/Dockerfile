@@ -1,9 +1,9 @@
 FROM golang:1.17-alpine3.14
 # RUN apk add build-base
-WORKDIR /app
+WORKDIR /ieam-backend
 
 COPY . .
-# RUN go mod download
+RUN go mod download
 RUN go build 
 EXPOSE 8080
 

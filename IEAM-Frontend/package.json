@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env API_ENV=development  nuxt",
-    "prod": "cross-env API_ENV=production  nuxt",
+    "dev": "cross-env API_ENV=development nuxt",
+    "prod": "cross-env API_ENV=production nuxt",
     "build": "nuxt build",
-    "start": "nuxt start",
+    "start": "cross-env API_ENV=production nuxt start",
     "generate": "nuxt generate"
   },
   "dependencies": {
