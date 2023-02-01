@@ -5,13 +5,6 @@ moment.locale("th");
 
 export default {
     async context(data) {
-        console.log("Data ------>", data);
-        // console.log(data.map((d) => {
-        //     return {
-        //         text: d,
-        //         style: 'tableHeader'
-        //     }
-        // }));
         var table = {
             style: "tableExample",
             margin: [0, 10, 0, 0],

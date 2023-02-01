@@ -1,5 +1,4 @@
-
-import env from './../env';
+import env from "~/env";
 // import firebase from 'firebase/app'
 import firebase from 'firebase'
 import 'firebase/storage'

@@ -173,7 +173,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import env from "~/env";
 export default {
   data() {
     return {
@@ -244,7 +244,7 @@ export default {
   methods: {
     async getUserall() {
       await this.$axios
-        .get(`${process.env.BASE_URL}/user/`)
+        .get(`${env.BASE_URL}/user/`)
         .then((response) => {
           this.userall = response.data?.data;
         });
@@ -261,17 +261,16 @@ export default {
     },
     async submit() {
       if (this.$refs.formlist.validate()) {
-        console.log(this.mode);
         if (this.mode == "c") {
           await this.$axios
-            .post(`${process.env.BASE_URL}/user/create`, this.userdetail)
+            .post(`${env.BASE_URL}/user/create`, this.userdetail)
             .then((response) => {
               alert("เพิ่มข้อมูลสำเร็จ");
             });
         }
         if (this.mode == "e") {
           await this.$axios
-            .patch(`${process.env.BASE_URL}/user/edite`, this.userdetail)
+            .patch(`${env.BASE_URL}/user/edite`, this.userdetail)
             .then((response) => {
               alert("แก้ไขข้อมูลสำเร็จ");
             });
@@ -285,7 +284,7 @@ export default {
     async del(item) {
       if (confirm("ต้องการลบข้อมูลนี้ใช่ไหม")) {
         this.$axios
-          .delete(`${process.env.BASE_URL}/user/delete`, {
+          .delete(`${env.BASE_URL}/user/delete`, {
             params: { id: this.userall[item].accountId },
           })
           .then((response) => {

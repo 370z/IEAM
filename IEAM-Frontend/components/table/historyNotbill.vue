@@ -87,6 +87,7 @@
   
   <script>
 import { storage } from "~/plugins/firebase";
+import env from "~/env";
 import moment from "moment";
 export default {
   props: {
@@ -141,7 +142,7 @@ export default {
         img_urlbill: url,
       };
       await this.$axios
-        .patch(`${process.env.BASE_URL}/approve/addbill`, data)
+        .patch(`${env.BASE_URL}/approve/addbill`, data)
         .then((response) => {
           alert("เพิ่มหลักฐานการชำระเงินเรียบร้อย");
           window.location.reload(true);

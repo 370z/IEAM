@@ -78,6 +78,7 @@
 
 <script>
 import moment from "moment";
+import env from "~/env";
 export default {
   data() {
     return {
@@ -118,7 +119,7 @@ export default {
     async getdashbord_historynotreturn() {
       if (this.$auth.state.user.level != 1) {
         await this.$axios
-          .get(`${process.env.BASE_URL}/dashbord/dashbord_historynotreturn`)
+          .get(`${env.BASE_URL}/dashbord/dashbord_historynotreturn`)
           .then((response) => {
             this.dashbord_notreturn = response.data?.data;
           });
@@ -127,7 +128,7 @@ export default {
     async getdashbord_data() {
       if (this.$auth.state.user.level == 1) {
         await this.$axios
-          .get(`${process.env.BASE_URL}/dashbord/dashbord`, {
+          .get(`${env.BASE_URL}/dashbord/dashbord`, {
             params: { id: this.$auth.state.user.accountId },
           })
           .then((response) => {
@@ -135,7 +136,7 @@ export default {
           });
       } else {
         await this.$axios
-          .get(`${process.env.BASE_URL}/dashbord/dashbord_all`)
+          .get(`${env.BASE_URL}/dashbord/dashbord_all`)
           .then((response) => {
             this.dashbord_data = response.data?.data;
             this.dashbord_numberform = response.data?.data_numberform;
@@ -145,19 +146,19 @@ export default {
     async gethistory() {
       if (this.$auth.state.user.level == 2) {
         await this.$axios
-          .get(`${process.env.BASE_URL}/history/approve`)
+          .get(`${env.BASE_URL}/history/approve`)
           .then((response) => {
             this.desserts = response.data?.data;
           });
       } else if (this.$auth.state.user.level == 3) {
         await this.$axios
-          .get(`${process.env.BASE_URL}/history/finance`)
+          .get(`${env.BASE_URL}/history/finance`)
           .then((response) => {
             this.desserts = response.data?.data;
           });
       } else {
         await this.$axios
-          .get(`${process.env.BASE_URL}/history/user`, {
+          .get(`${env.BASE_URL}/history/user`, {
             params: { id: this.$auth.state.user.accountId },
           })
           .then((response) => {

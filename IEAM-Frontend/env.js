@@ -1,5 +1,4 @@
 const envCf = require('dotenv');
-
 envCf.config();
 
 let FIREBASE = {	
@@ -17,14 +16,14 @@ let env = {
 		VERSION: '1.0.0(beta)',
 		BASE_URL:'http://localhost:8080',
 		FIREBASE,
-		FIREBASE_ENV: 'development'
 	},
 	production: {
 		VERSION: '1.0.1',
-		BASE_URL:'http://localhost:8080',
+		BASE_URL:'http://project.ichigozdata.win:8080',
 		FIREBASE,
-		FIREBASE_ENV: 'production'
 	},
 }
-
-module.exports = env[process.env.API_ENV || process.env.NODE_ENV] || {};
+console.log(env[process.env.API_ENV]);
+module.exports = env[process.env.API_ENV]
+    ? env[process.env.API_ENV]
+    : env["development"];

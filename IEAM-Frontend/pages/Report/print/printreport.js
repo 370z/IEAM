@@ -5,7 +5,6 @@ moment.locale("th");
 
 export default {
     async context(data, search) {
-        console.log(data);
         var table = {
             style: "tableExample",
             margin: [10, 20, 10, 0],

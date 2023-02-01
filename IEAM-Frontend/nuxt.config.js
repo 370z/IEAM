@@ -5,7 +5,7 @@ const env = require("./env");
 export default {
   env: {
     ...env,
-    API_ENV: process.env.API_ENV
+    ...process.env
   },
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
@@ -88,9 +88,9 @@ export default {
           // autoFetch: true
         },
         endpoints: {
-          login: { url: `${process.env.BASE_URL}/auth/login`, method: 'post' },
+          login: { url: `${env.BASE_URL}/auth/login`, method: 'post' },
           logout: { url: '/api/auth/logout', method: 'post' },
-          user: { url: `${process.env.BASE_URL}/user/detail`, method: 'get' }
+          user: { url: `${env.BASE_URL}/user/detail`, method: 'get' }
         }
       }
     },

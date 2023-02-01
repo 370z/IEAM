@@ -228,6 +228,7 @@
 </template>
 
 <script>
+import env from "~/env";
 import { storage } from "~/plugins/firebase";
 export default {
   props: {
@@ -321,7 +322,7 @@ export default {
     }
     if (this.mode != "c") {
       this.$axios
-        .get(`${process.env.BASE_URL}/form/detail`, {
+        .get(`${env.BASE_URL}/form/detail`, {
           params: this.$route.params,
         })
         .then((response) => {
@@ -403,7 +404,7 @@ export default {
         if (this.mode != "e") {
           this.mode == "r"
             ? await this.$axios
-                .post(`${process.env.BASE_URL}/form/addreturn`, {
+                .post(`${env.BASE_URL}/form/addreturn`, {
                   id_form: parseInt(this.$route.params.id),
                   returnborrow: {
                     ...this.list,
@@ -416,7 +417,7 @@ export default {
                   this.$router.replace("/arrears");
                 })
             : await this.$axios
-                .post(`${process.env.BASE_URL}/form/add`, {
+                .post(`${env.BASE_URL}/form/add`, {
                   ...this.list,
                   total: parseInt(this.list.total),
                   userId: this.$auth.state.user.accountId,
@@ -428,7 +429,7 @@ export default {
         } else {
           this.uploadFirebase(this.selectedFile[0]);
           await this.$axios
-            .put(`${process.env.BASE_URL}/form/update`, {
+            .put(`${env.BASE_URL}/form/update`, {
               ...this.list,
               total: +this.list.total,
               userId: this.$auth.state.user.accountId,

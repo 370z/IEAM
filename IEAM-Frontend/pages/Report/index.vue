@@ -95,6 +95,7 @@
 <script>
 import moment from "moment";
 import printreport from "./print/printreport";
+import env from "~/env";
 moment.locale("th");
 
 export default {
@@ -198,7 +199,7 @@ export default {
           : null,
       };
       await this.$axios
-        .post(`${process.env.BASE_URL}/report/all`, data)
+        .post(`${env.BASE_URL}/report/all`, data)
         .then((response) => {
           this.desserts = response.data?.data;
           this.loading = false;

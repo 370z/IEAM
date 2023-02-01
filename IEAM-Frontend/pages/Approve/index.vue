@@ -183,7 +183,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import env from "~/env";
 export default {
   data() {
     return {
@@ -248,7 +248,7 @@ export default {
   methods: {
     async gettransfermdetail() {
       await this.$axios
-        .get(`${process.env.BASE_URL}/form/all`)
+        .get(`${env.BASE_URL}/form/all`)
         .then((response) => {
           this.account_wbr_approve = response.data?.data;
         });
@@ -260,7 +260,7 @@ export default {
     async change_status(type) {
       if (type == "confirm") {
         await this.$axios
-          .patch(`${process.env.BASE_URL}/approve/approve`, {
+          .patch(`${env.BASE_URL}/approve/approve`, {
             ...this.confirm,
             isapprove: 1,
           })
@@ -275,7 +275,7 @@ export default {
       } else {
         if (confirm("ทำการไม่อนุมัติใช่ไหม")) {
           await this.$axios
-            .patch(`${process.env.BASE_URL}/approve/approve`, {
+            .patch(`${env.BASE_URL}/approve/approve`, {
               ...this.confirm,
               isapprove: 2,
             })

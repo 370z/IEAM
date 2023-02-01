@@ -133,6 +133,7 @@
 
 <script>
 import { storage } from "~/plugins/firebase";
+import env from "~/env";
 export default {
   data() {
     return {
@@ -246,7 +247,7 @@ export default {
         img_urltransfer: url,
       };
       await this.$axios
-        .patch(`${process.env.BASE_URL}/approve/transfermomey`, data)
+        .patch(`${env.BASE_URL}/approve/transfermomey`, data)
         .then((response) => {
           alert("เพิ่มหลักฐานการชำระเงินเรียบร้อย");
           window.location.reload(true);
@@ -258,7 +259,7 @@ export default {
 
     async gettransfermdetail() {
       await this.$axios
-        .get(`${process.env.BASE_URL}/wer/approve`)
+        .get(`${env.BASE_URL}/wer/approve`)
         .then((response) => {
           this.datatable = response.data?.data;
         });

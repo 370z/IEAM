@@ -20,6 +20,7 @@
 </template>
   
   <script>
+import env from "~/env";
 export default {
   data() {
     return {
@@ -29,14 +30,14 @@ export default {
     };
   },
   mounted() {
-    var id = this.$auth.state.user.accountId
+    var id = this.$auth.state.user.accountId;
     this.getnotbill(id);
     this.getnotreturn(id);
   },
   methods: {
     getnotbill(id) {
       this.$axios
-        .get(`${process.env.BASE_URL}/notreturnbill/Getnotreturnbill`, {
+        .get(`${env.BASE_URL}/notreturnbill/Getnotreturnbill`, {
           params: { id: id },
         })
         .then((response) => {
@@ -45,7 +46,7 @@ export default {
     },
     getnotreturn(id) {
       this.$axios
-        .get(`${process.env.BASE_URL}/notreturn/getnotreturn`, {
+        .get(`${env.BASE_URL}/notreturn/getnotreturn`, {
           params: { id: id },
         })
         .then((response) => {

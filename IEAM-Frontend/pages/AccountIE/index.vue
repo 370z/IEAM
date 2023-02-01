@@ -136,6 +136,7 @@
 
 <script>
 import moment from "moment";
+import env from "~/env";
 export default {
   data() {
     return {
@@ -206,7 +207,7 @@ export default {
   methods: {
     async gettransfermdetail() {
       await this.$axios
-        .get(`${process.env.BASE_URL}/ie/all`)
+        .get(`${env.BASE_URL}/ie/all`)
         .then((response) => {
           this.form = response.data?.data;
         });
@@ -219,10 +220,9 @@ export default {
       this.$router.push(`AccountIE/${item}`);
     },
     async del(item, index) {
-      console.log(item, index);
       if (confirm("ต้องการลบข้อมูลนี้ใช่ไหม")) {
         this.$axios
-          .delete(`${process.env.BASE_URL}/form/delete`, {
+          .delete(`${env.BASE_URL}/form/delete`, {
             params: { id: item },
           })
           .then((response) => {
@@ -237,7 +237,6 @@ export default {
       return result;
     },
     dialogviewclick() {
-      console.log(item);
       this.dialog = item;
     },
   },
