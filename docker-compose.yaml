@@ -30,13 +30,10 @@ services:
     build:
       context: ./IEAM-Frontend
       dockerfile: Dockerfile
-      args:
-        BASE_URL: http://project.ichigozdata.win:3000
-        API_URL: http://project.ichigozdata.win:8080
     container_name: ball_frontend
     restart: always
     ports:
-      - "3000:80"
+      - "3000:3000"
     networks:
       - ball-network
 volumes:
