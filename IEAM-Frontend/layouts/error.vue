@@ -22,6 +22,9 @@ export default {
       default: null
     }
   },
+  mounted(){
+    this.$router.push({ path: "/dashboard" });
+  },
   data () {
     return {
       pageNotFound: '404 Not Found',
