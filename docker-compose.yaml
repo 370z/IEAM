@@ -32,13 +32,12 @@ services:
     ports:
       - '8080:8080'
     volumes:
-      - ./IEAM-Backend:/opt/app/api
+      - ./IEAM-Backend:/opt/app/api 
     depends_on:
       - db
     networks:
       - ball-network
   web:
-    # build: ./IEAM-Frontend
     build:
       context: ./IEAM-Frontend
       dockerfile: Dockerfile
@@ -48,6 +47,7 @@ services:
       - "3000:3000"
     networks:
       - ball-network
+    command: 'npm run prod'
 volumes:
   db:
     driver: local
