@@ -14,12 +14,12 @@ let FIREBASE = {
 let env = {
 	development: {
 		VERSION: '1.0.0(beta)',
-		BASE_URL:'http://project.ichigozdata.win:8080',
+		BASE_URL:'https://ieam-api.ichigozdata.win',
 		FIREBASE,
 	},
 	production: {
 		VERSION: '1.0.1',
-		BASE_URL:'http://project.ichigozdata.win:8080',
+		BASE_URL:'https://ieam-api.ichigozdata.win',
 		FIREBASE,
 	},
 }

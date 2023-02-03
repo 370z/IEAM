@@ -1,5 +1,17 @@
 version: '3.8'
 services:
+  proxy:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./etc/data:/data
+      - ./etc/letsencrypt:/etc/letsencrypt
+    networks:
+      - ball-network
   db:
     image: postgres
     container_name: ball_db
@@ -36,15 +48,6 @@ services:
       - "3000:3000"
     networks:
       - ball-network
-  proxy:
-    image: nginx:stable-alpine
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./etc/ssl:/etc/nginx/ssl
-    restart: always
 volumes:
   db:
     driver: local

@@ -1,0 +1,50 @@
+2023/02/03 12:16:35 [warn] 298#298: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:16:35 [alert] 298#298: 1024 worker_connections are not enough
+2023/02/03 12:16:35 [error] 298#298: *1018 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 127.0.0.1, server: localhost-nginx-proxy-manager, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:80/favicon.ico", host: "159.203.115.16", referrer: "http://159.203.115.16/"
+2023/02/03 12:20:31 [error] 298#298: *1021 upstream prematurely closed connection while reading response header from upstream, client: 118.172.59.233, server: nginxproxymanager, request: "GET /api/nginx/certificates/test-http?domains=%5B%22*.ichigozdata.win%22%5D HTTP/1.1", upstream: "http://127.0.0.1:3000/nginx/certificates/test-http?domains=%5B%22*.ichigozdata.win%22%5D", host: "159.203.115.16:81", referrer: "http://159.203.115.16:81/nginx/certificates"
+2023/02/03 12:20:32 [error] 298#298: *1021 connect() failed (111: Connection refused) while connecting to upstream, client: 118.172.59.233, server: nginxproxymanager, request: "GET /api/ HTTP/1.1", upstream: "http://127.0.0.1:3000/", host: "159.203.115.16:81", referrer: "http://159.203.115.16:81/nginx/certificates"
+2023/02/03 12:20:50 [error] 324#324: *1056 upstream prematurely closed connection while reading response header from upstream, client: 118.172.59.233, server: nginxproxymanager, request: "GET /api/nginx/certificates/test-http?domains=%5B%22*.ichigozdata.win%22%2C%22project.ichigozdata.win%22%5D HTTP/1.1", upstream: "http://127.0.0.1:3000/nginx/certificates/test-http?domains=%5B%22*.ichigozdata.win%22%2C%22project.ichigozdata.win%22%5D", host: "159.203.115.16:81", referrer: "http://159.203.115.16:81/nginx/certificates"
+2023/02/03 12:21:21 [error] 349#349: *1060 upstream prematurely closed connection while reading response header from upstream, client: 118.172.59.233, server: nginxproxymanager, request: "GET /api/nginx/certificates/test-http?domains=%5B%22*.ichigozdata.win%22%2C%22ichigozdata.win%22%5D HTTP/1.1", upstream: "http://127.0.0.1:3000/nginx/certificates/test-http?domains=%5B%22*.ichigozdata.win%22%2C%22ichigozdata.win%22%5D", host: "159.203.115.16:81", referrer: "http://159.203.115.16:81/nginx/certificates"
+2023/02/03 12:22:57 [error] 374#374: *1067 upstream prematurely closed connection while reading response header from upstream, client: 118.172.59.233, server: nginxproxymanager, request: "GET /api/nginx/certificates/test-http?domains=%5B%22*.ichigozdata.win%22%2C%22ichigozdata.win%22%5D HTTP/1.1", upstream: "http://127.0.0.1:3000/nginx/certificates/test-http?domains=%5B%22*.ichigozdata.win%22%2C%22ichigozdata.win%22%5D", host: "159.203.115.16:81", referrer: "http://159.203.115.16:81/nginx/certificates"
+2023/02/03 12:26:45 [error] 399#399: *1115 open() "/var/www/html/boaform/admin/formLogin" failed (2: No such file or directory), client: 179.43.177.242, server: localhost-nginx-proxy-manager, request: "POST /boaform/admin/formLogin HTTP/1.1", host: "159.203.115.16:80", referrer: "http://159.203.115.16:80/admin/login.asp"
+2023/02/03 12:29:33 [alert] 457#457: 1024 worker_connections are not enough
+2023/02/03 12:29:34 [warn] 457#457: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:29:34 [alert] 457#457: 1024 worker_connections are not enough
+2023/02/03 12:29:40 [warn] 457#457: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:29:40 [alert] 457#457: 1024 worker_connections are not enough
+2023/02/03 12:29:41 [warn] 457#457: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:29:41 [alert] 457#457: 1024 worker_connections are not enough
+2023/02/03 12:30:29 [warn] 457#457: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:30:29 [alert] 457#457: 1024 worker_connections are not enough
+2023/02/03 12:30:30 [warn] 457#457: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:30:30 [alert] 457#457: 1024 worker_connections are not enough
+2023/02/03 12:31:31 [alert] 467#467: 1024 worker_connections are not enough
+2023/02/03 12:31:32 [warn] 467#467: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:31:32 [alert] 467#467: 1024 worker_connections are not enough
+2023/02/03 12:31:33 [warn] 467#467: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:31:33 [alert] 467#467: 1024 worker_connections are not enough
+2023/02/03 12:31:34 [warn] 467#467: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:31:34 [alert] 467#467: 1024 worker_connections are not enough
+2023/02/03 12:31:44 [warn] 467#467: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:31:44 [alert] 467#467: 1024 worker_connections are not enough
+2023/02/03 12:31:45 [warn] 467#467: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:31:45 [alert] 467#467: 1024 worker_connections are not enough
+2023/02/03 12:31:47 [warn] 467#467: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:31:47 [alert] 467#467: 1024 worker_connections are not enough
+2023/02/03 12:31:48 [warn] 467#467: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:31:48 [alert] 467#467: 1024 worker_connections are not enough
+2023/02/03 12:32:19 [alert] 477#477: 1024 worker_connections are not enough
+2023/02/03 12:32:19 [error] 477#477: *16587 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 127.0.0.1, server: localhost-nginx-proxy-manager, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:80/favicon.ico", host: "159.203.115.16", referrer: "http://159.203.115.16/"
+2023/02/03 12:41:11 [error] 503#503: *16649 open() "/var/www/html/systembc/password.php" failed (2: No such file or directory), client: 45.56.108.128, server: localhost-nginx-proxy-manager, request: "GET /systembc/password.php HTTP/1.0"
+2023/02/03 12:43:50 [warn] 503#503: 1024 worker_connections are not enough, reusing connections
+2023/02/03 12:43:50 [alert] 503#503: 1024 worker_connections are not enough
+2023/02/03 12:43:50 [error] 503#503: *17870 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 127.0.0.1, server: localhost-nginx-proxy-manager, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:80/favicon.ico", host: "159.203.115.16", referrer: "http://159.203.115.16/"
+2023/02/03 13:01:29 [error] 555#555: *19411 open() "/var/www/html/robots.txt" failed (2: No such file or directory), client: 45.93.16.27, server: localhost-nginx-proxy-manager, request: "HEAD /robots.txt HTTP/1.0"
+2023/02/03 13:24:39 [error] 569#569: *19677 open() "/var/www/html/config/getuser" failed (2: No such file or directory), client: 81.161.229.94, server: localhost-nginx-proxy-manager, request: "GET /config/getuser?index=0 HTTP/1.1", host: "159.203.115.16:80"
+2023/02/03 14:01:50 [warn] 655#655: 1024 worker_connections are not enough, reusing connections
+2023/02/03 14:01:50 [alert] 655#655: 1024 worker_connections are not enough
+2023/02/03 14:01:50 [error] 655#655: *21312 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 127.0.0.1, server: localhost-nginx-proxy-manager, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:80/favicon.ico", host: "ieam-api.ichigozdata.win", referrer: "https://ieam-api.ichigozdata.win/"
+2023/02/03 14:10:12 [error] 665#665: *21380 open() "/var/www/html/boaform/admin/formLogin" failed (2: No such file or directory), client: 185.246.220.98, server: localhost-nginx-proxy-manager, request: "POST /boaform/admin/formLogin HTTP/1.1", host: "159.203.115.16:80", referrer: "http://159.203.115.16:80/admin/login.asp"
+2023/02/03 14:11:07 [warn] 665#665: 1024 worker_connections are not enough, reusing connections
+2023/02/03 14:11:07 [alert] 665#665: 1024 worker_connections are not enough
+2023/02/03 14:11:07 [error] 665#665: *22400 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 127.0.0.1, server: localhost-nginx-proxy-manager, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:80/favicon.ico", host: "ieam-db.ichigozdata.win", referrer: "https://ieam-db.ichigozdata.win/"
